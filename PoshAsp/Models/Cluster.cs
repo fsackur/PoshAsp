@@ -34,6 +34,7 @@ namespace PoshAsp.Models
                 ClusterGroup ClusterGroup = new ClusterGroup();
                 ClusterGroup.Name = result.Members["Name"].Value.ToString();
                 ClusterGroup.OwnerNode = _Nodes.First(Node => Node.Name == result.Members["OwnerNode"].Value.ToString());
+                ClusterGroup.Online = result.Members["State"].Value.ToString() == "Online";
                 _ClusterGroups.Add(ClusterGroup);
             }
         }

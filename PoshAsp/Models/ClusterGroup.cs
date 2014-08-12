@@ -9,5 +9,6 @@ namespace PoshAsp.Models
     {
         public string Name { get; set; }
         public Computer OwnerNode { get; set; }
+        public bool Online { get; set; }
     }
 }
