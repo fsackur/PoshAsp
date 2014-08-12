@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+*.pubxml
 
 # Build results
 
@@ -137,9 +138,6 @@ App_Data/*.ldf
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
-
-# Publish profiles
-Properties/PublishProfiles/
 
 # =========================
 # Windows detritus
