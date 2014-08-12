@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "Computer Actions";
+}
+
+<div class="jumbotron">
+    <h1>Computer Actions</h1>
+    <p class="lead">Actions to be performed on individual computers</p>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form class="form-inline" role="form">
+            <input type="text" id="ComputerName" class="form-control input-lg" placeholder="Computer name" onkeypress="return checkSubmit(event)" />
+            <button type="button" id="GetDetails" class="btn btn-primary btn-lg" onclick="loadComputerDetails()">Get details</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <script language="javascript">
+        function checkSubmit(event) {
+            if (event.which == 13) {
+                event.preventDefault();
+                $("#ComputerName").blur();
+                $("#GetDetails").click();
+            }
+        }
+
+        function loadComputerDetails() {
+            $("#ComputerDetails").html("")
+            $("#GetDetails").prop("disabled", "disabled")
+            $("#GetDetails").text("Retrieving details...")
+
+            $.getJSON("./api/computer/" + $("#ComputerName").val())
+            .done(function (result) {
+                $("#ComputerDetails").append("<ul id=\"DetailsList\" class=\"list-unstyled\">");
+                $("#DetailsList").append("<li><h3>IP addresses</h3></li><ul id=\"IpAddresses\">");
+
+                $.each(result.IpAddresses, function (index, value) {
+                    $("#IpAddresses").append("<li><h4>" + value.Address + "/" + value.PrefixLength + "</h4></li>");
+                });
+
+                $("#DetailsList").append("</ul>");
+                $("#ComputerDetails").append("</ul>");
+                $("#GetDetails").text("Get details");
+                $("#GetDetails").prop("disabled", "");
+            })
+        }
+    </script>
+    <div id="ComputerDetails" class="col-md-4">
+
+    </div>
+</div>
+
+

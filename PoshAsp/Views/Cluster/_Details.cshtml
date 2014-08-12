@@ -1,0 +1,205 @@
+﻿<div class="jumbotron">
+    <h1>Cluster Actions</h1>
+    <p class="lead">Actions to be performed on clusters</p>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form class="form-inline" role="form">
+            <input type="text" id="ClusterName" class="form-control input-lg" placeholder="Cluster name" onkeypress="return checkSubmit(event)" />
+            <button type="button" id="GetDetails" class="btn btn-primary btn-lg" onclick="loadClusterDetails()">Get details</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div id="ClusterDetails" class="col-md-6">
+
+    </div>
+    <div id="RememberedDetails" class="col-md-6">
+
+    </div>
+</div>
+
+<script language="javascript">
+    function checkSubmit(event) {
+        if (event.which == 13) {
+            event.preventDefault()
+            $("#ClusterName").blur()
+            $("#GetDetails").click()
+        }
+    }
+
+    function disableButtons(disabled) {
+        if (disabled) {
+            $("#GetDetails").prop("disabled", "disabled")
+            $(".posh-move").prop("disabled", "disabled")
+            $("#Remember").prop("disabled", "disabled")
+            $("#Revert").prop("disabled", "disabled")
+        } else {
+            $("#GetDetails").prop("disabled", "")
+            $(".posh-move").prop("disabled", "")
+            $("#Remember").prop("disabled", "")
+
+            if (sessionStorage.getItem("currentClusterDetails") != sessionStorage.getItem("rememberedClusterDetails")) {
+                $("#Revert").prop("disabled", "");
+            } else {
+                $("#Revert").prop("disabled", "disabled");
+            }
+        }
+    }
+
+    function buildClusterDetails(element, cluster, includeButtons, includeRemember) {
+        $("#" + element).empty();
+
+        if (includeRemember) {
+            $("#" + element).append("<button id=\"Remember\" class=\"btn btn-lg btn-success\" onclick=\"rememberClusterDetails()\">Remember</button>");
+            $("#" + element).append("&nbsp;<button id=\"Revert\" class=\"btn btn-lg btn-danger\" onclick=\"revertCluster()\">Revert</button>");
+        }
+
+        $("#" + element).append("<ul id=\"DetailsList\" class=\"list-unstyled\">");
+
+        $.each(cluster.Nodes, function (index, clusterNode) {
+            moveAllButton = false;
+
+            $("#" + element).find("#DetailsList").append("<li class=\"cluster-node " + clusterNode.Name + "\"><h3 class=\"" + clusterNode.Name + "\" >" + clusterNode.Name + "</h3>");
+            $("#" + element).find("li." + clusterNode.Name).append("<ul class=\"" + clusterNode.Name + "\">");
+
+            $.each(cluster.ClusterGroups, function (index, clusterGroup) {
+                if (clusterGroup.OwnerNode.Name == clusterNode.Name) {
+                    moveAllButton = true;
+                    $("#" + element).find("ul." + clusterNode.Name).append("<li class=\"cluster-group\"><h4 class=\"" + clusterGroup.Name + "\">" + clusterGroup.Name + "</h4></li>");
+
+                    if (includeButtons) {
+                        $("#" + element).find("h4[class='" + clusterGroup.Name + "']").append("&nbsp;<button type=\"button\" id=\"move-" + clusterGroup.Name + "\" class=\"btn btn-sm btn-danger posh-move\" onclick=\"moveCluster('group','" + clusterGroup.Name + "')\">Move</button>");
+                    }
+                }
+            });
+
+            if (moveAllButton && includeButtons) {
+                $("#" + element).find("h3." + clusterNode.Name).append("&nbsp;<button type=\"button\" id=\"move-" + clusterNode.Name + "\" class=\"btn btn-danger posh-move\" onclick=\"moveCluster('node','" + clusterNode.Name + "')\">Move all</button>");
+            }
+
+            $("#" + element).find("#li." + clusterNode.Name).append("</ul>");
+        });
+    }
+
+    function loadClusterDetails() {
+        $("#ClusterDetails").empty();
+        $("#RememberedDetails").empty();
+        disableButtons(true);
+        $("#GetDetails").text("Retrieving details...")
+
+        $.getJSON("@Request.ApplicationPath/api/cluster/" + $("#ClusterName").val())
+        .done(function (result) {
+            sessionStorage.setItem("currentClusterDetails", JSON.stringify(result));
+            buildClusterDetails("ClusterDetails", result, true, false);
+
+            if (sessionStorage.getItem("rememberedClusterDetails")) {
+                rememberedClusterDetails = $.parseJSON(sessionStorage.getItem("rememberedClusterDetails"));
+
+                if (rememberedClusterDetails.Name != result.Name) {
+                    rememberedClusterDetails = null;
+                    sessionStorage.removeItem("rememberedClusterDetails");
+                }
+            } else {
+                rememberedClusterDetails = null;
+            }
+
+            if (rememberedClusterDetails) {
+                buildClusterDetails("RememberedDetails", rememberedClusterDetails, false, true);
+            } else {
+                $("#RememberedDetails").html("<button id=\"Remember\" class=\"btn btn-lg btn-success\" onclick=\"rememberClusterDetails()\">Remember</button>");
+            }
+
+            $("#GetDetails").text("Get details");
+            disableButtons(false);
+        })
+    }
+
+    function moveCluster(type, source, destination) {
+        currentState = $.parseJSON(sessionStorage.getItem("currentClusterDetails"));
+        desiredState = currentState;
+
+        if (type == "node") {
+            $("button[id='move-" + source + "']").text("Moving...");
+
+            $.each(currentState.Nodes, function (index, clusterNode) {
+                if (clusterNode.Name == source) {
+                    currentOwnerNode = clusterNode;
+                } else if (!destination && clusterNode.Name != source) {
+                    desiredOwnerNode = clusterNode;
+                } else if (clusterNode.Name == destination) {
+                    desiredOwnerNode = clusterNode;
+                }
+            });
+
+            $.each(currentState.ClusterGroups, function (index, clusterGroup) {
+                if (clusterGroup.OwnerNode.Name == currentOwnerNode.Name) {
+                    desiredState.ClusterGroups[index].OwnerNode = desiredOwnerNode;
+                }
+            });
+        } else if (type == "group") {
+            $.each(currentState.ClusterGroups, function (index, clusterGroup) {
+                if (clusterGroup.Name == source) {
+                    currentOwner = clusterGroup.OwnerNode;
+                }
+            });
+
+            $.each(currentState.Nodes, function (index, clusterNode) {
+                if (!destination && clusterNode.Name != currentOwner.Name) {
+                    desiredOwnerNode = clusterNode;
+                } else if (clusterNode.Name == destination) {
+                    desiredOwnerNode = clusterNode;
+                }
+            });
+
+            $.each(currentState.ClusterGroups, function (index, clusterGroup) {
+                if (clusterGroup.Name == source) {
+                    desiredState.ClusterGroups[index].OwnerNode = desiredOwnerNode;
+                }
+            });
+        }
+
+        remediateCluster(desiredState);
+    }
+
+    function rememberClusterDetails() {
+        sessionStorage.setItem("rememberedClusterDetails", sessionStorage.getItem("currentClusterDetails"));
+        buildClusterDetails("RememberedDetails", $.parseJSON(sessionStorage.getItem("rememberedClusterDetails")), false, true);
+        $("#Revert").prop("disabled", "disabled");
+    }
+
+    function revertCluster() {
+        $("#Revert").text("Reverting...");
+        remediateCluster($.parseJSON(sessionStorage.getItem("rememberedClusterDetails")));
+    }
+
+    function remediateCluster(desiredState) {
+        disableButtons(true);
+        currentState = $.parseJSON(sessionStorage.getItem("currentClusterDetails"));
+
+        $.each(desiredState.ClusterGroups, function (index, clusterGroup) {
+            if (clusterGroup.OwnerNode.Name != currentState.ClusterGroups[index].OwnerNode.Name) {
+                $("button[id='move-" + clusterGroup.Name + "']").text("Moving...");
+            }
+        });
+
+        $.ajax({
+            url: "@Request.ApplicationPath/api/cluster/" + desiredState.Name,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(desiredState),
+            type: "PUT"
+        })
+        .done(function (result) {
+            sessionStorage.setItem("currentClusterDetails", JSON.stringify(result));
+            buildClusterDetails("ClusterDetails", result, true, false);
+
+            if (sessionStorage.getItem("rememberedClusterDetails")) {
+                buildClusterDetails("RememberedDetails", $.parseJSON(sessionStorage.getItem("rememberedClusterDetails")), false, true);
+            }
+
+            disableButtons(false);
+        });
+    }
+</script>

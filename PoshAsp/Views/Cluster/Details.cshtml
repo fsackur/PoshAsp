@@ -1,0 +1,16 @@
+﻿@model string
+
+@{
+    ViewBag.Title = "Cluster Actions";
+}
+
+@section Scripts {
+    <script language="javascript">
+        $(document).ready(function () {
+            $("#ClusterName").val("@Model");
+            $("#GetDetails").click();
+        });
+    </script>
+}
+
+@Html.Partial("_Details")
