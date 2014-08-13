@@ -211,12 +211,17 @@
             if (sessionStorage.getItem("rememberedClusterDetails")) {
                 buildClusterDetails("RememberedDetails", $.parseJSON(sessionStorage.getItem("rememberedClusterDetails")), false, true);
             }
+
+            disableButtons(false);
         })
         .fail(function (result) {
-            alert(result.responseJSON.Message);
-        })
-        .always(function () {
-            disableButtons(false);
+            if (result.responseJSON) {
+                alert(result.responseJSON.Message);
+            } else {
+                alert(result.status + ": " + result.statusText);
+            }
+
+            loadClusterDetails();
         });
     }
 </script>
