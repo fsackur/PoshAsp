@@ -94,7 +94,7 @@
                         if (clusterGroup.PreferredOwners != null) {
                             $.each(clusterGroup.PreferredOwners, function (index, preferredOwner) {
                                 if (preferredOwner.Name != clusterGroup.OwnerNode.Name) {
-                                    $("ul[id='move-" + clusterGroup.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('group','" + clusterGroup.Name + "','" + preferredOwner.Name + "')\"><strong>" + preferredOwner.Name + "</strong></a></li>");
+                                    $("ul[id='move-" + clusterGroup.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('group','" + clusterGroup.Name + "','" + preferredOwner.Name + "'); return false;\"><strong>" + preferredOwner.Name + "</strong></a></li>");
                                 }
                             })
 
@@ -105,7 +105,7 @@
 
                         $.each(clusterGroup.PossibleOwners, function (index, possibleOwner) {
                             if (possibleOwner.Name != clusterGroup.OwnerNode.Name && $("ul[id='move-" + clusterGroup.Name + "']:contains('" + possibleOwner.Name + "')").length == 0) {
-                                $("ul[id='move-" + clusterGroup.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('group','" + clusterGroup.Name + "','" + possibleOwner.Name + "')\">" + possibleOwner.Name + "</a></li>");
+                                $("ul[id='move-" + clusterGroup.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('group','" + clusterGroup.Name + "','" + possibleOwner.Name + "'); return false;\">" + possibleOwner.Name + "</a></li>");
                             }
                         })
                     }
