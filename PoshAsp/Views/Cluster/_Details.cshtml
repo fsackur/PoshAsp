@@ -98,7 +98,7 @@
                                 }
                             })
 
-                            if (clusterGroup.PreferredOwners.length > 1) {
+                            if (clusterGroup.PossibleOwners.length > 1) {
                                 $("ul[id='move-" + clusterGroup.Name + "']").append("<li class=\"divider\"></li>");
                             }
                         }
@@ -113,7 +113,17 @@
             });
 
             if (moveAllButton && includeButtons) {
-                $("#" + element).find("h3." + clusterNode.Name).append("&nbsp;<button type=\"button\" id=\"move-" + clusterNode.Name + "\" class=\"btn btn-danger posh-move\" onclick=\"moveCluster('node','" + clusterNode.Name + "')\">Move all</button>");
+                $("#" + element).find("h3[class='" + clusterNode.Name + "']").append("&nbsp;<div id=\"move-" + clusterNode.Name + "\" class=\"btn-group\"></div>");
+                $("div[id='move-" + clusterNode.Name + "']").append("<button type=\"button\" id=\"move-" + clusterNode.Name + "\" class=\"btn btn-danger dropdown-toggle posh-move\" data-toggle=\"dropdown\">Move all <span class=\"caret\" /></button>");
+                $("div[id='move-" + clusterNode.Name + "']").append("<ul id=\"move-" + clusterNode.Name + "\" class=\"dropdown-menu\" role=\"menu\"></ul>");
+
+                $.each(cluster.Nodes, function (index, newClusterNode) {
+                    if ($("#" + element).find("ul." + clusterNode.Name).find("div.btn-group:contains('" + newClusterNode.Name + "')").length == $("#" + element).find("ul." + clusterNode.Name).find("li.cluster-group").length) {
+                        $("ul[id='move-" + clusterNode.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('node','" + clusterNode.Name + "','" + newClusterNode.Name + "'); return false;\">" + newClusterNode.Name + "</a></li>");
+                    }
+                })
+                
+                //$("#" + element).find("h3." + clusterNode.Name).append("&nbsp;<button type=\"button\" id=\"move-" + clusterNode.Name + "\" class=\"btn btn-danger posh-move\" onclick=\"moveCluster('node','" + clusterNode.Name + "')\">Move all</button>");
             }
 
             $("#" + element).find("#li." + clusterNode.Name).append("</ul>");
