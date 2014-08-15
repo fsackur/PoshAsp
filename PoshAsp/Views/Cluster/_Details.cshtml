@@ -87,6 +87,8 @@
                     $("#" + element).find("ul." + clusterNode.Name).append("<li class=\"cluster-group\"><h4 class=\"" + clusterGroup.Name + " " + clusterGroupClass + "\">" + clusterGroup.Name + "</h4></li>");
 
                     if (includeButtons && clusterGroup.PossibleOwners.length > 1) {
+                        preferredOwnerPresent = false;
+
                         $("#" + element).find("h4[class='" + clusterGroup.Name + " " + clusterGroupClass + "']").append("&nbsp;<div id=\"move-" + clusterGroup.Name + "\" class=\"btn-group\"></div>");
                         $("div[id='move-" + clusterGroup.Name + "']").append("<button type=\"button\" id=\"move-" + clusterGroup.Name + "\" class=\"btn btn-sm btn-danger dropdown-toggle posh-move\" data-toggle=\"dropdown\">Move <span class=\"caret\" /></button>");
                         $("div[id='move-" + clusterGroup.Name + "']").append("<ul id=\"move-" + clusterGroup.Name + "\" class=\"dropdown-menu\" role=\"menu\"></ul>");
@@ -94,11 +96,12 @@
                         if (clusterGroup.PreferredOwners != null) {
                             $.each(clusterGroup.PreferredOwners, function (index, preferredOwner) {
                                 if (preferredOwner.Name != clusterGroup.OwnerNode.Name) {
+                                    preferredOwnerPresent = true;
                                     $("ul[id='move-" + clusterGroup.Name + "']").append("<li><a href=\"#\" onclick=\"moveCluster('group','" + clusterGroup.Name + "','" + preferredOwner.Name + "'); return false;\"><strong>" + preferredOwner.Name + "</strong></a></li>");
                                 }
                             })
 
-                            if (clusterGroup.PossibleOwners.length > 1) {
+                            if (clusterGroup.PossibleOwners.length > 1 && preferredOwnerPresent) {
                                 $("ul[id='move-" + clusterGroup.Name + "']").append("<li class=\"divider\"></li>");
                             }
                         }
