@@ -1,0 +1,40 @@
+﻿@model PoshAsp.Models.LogEntries
+
+@{
+    ViewBag.Title = "History";
+}
+
+<h2>History</h2>
+
+<table class="table">
+    <tr>
+        <th>Timestamp</th>
+        <th>Username</th>
+        <th>Action</th>
+        <th>Prior state</th>
+        <th>Resultant state</th>
+    </tr>
+
+@foreach (var item in Model) {
+        PoshAsp.Models.Cluster OldCluster = (PoshAsp.Models.Cluster)item.Data["Before"];
+        PoshAsp.Models.Cluster NewCluster = (PoshAsp.Models.Cluster)item.Data["After"];
+    <tr>
+        <td>@item.Timestamp</td>
+        <td>@item.Username</td>
+        <td>@item.Text</td>
+        <td>
+            @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in OldCluster.ClusterGroups)
+            {
+                @ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name<br />
+            }
+        </td>
+        <td>
+            @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in NewCluster.ClusterGroups)
+            {
+                @ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name<br />
+            }
+        </td>
+    </tr>
+}
+
+</table>

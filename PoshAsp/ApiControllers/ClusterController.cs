@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using PoshAsp.Models;
 
@@ -20,6 +21,15 @@ namespace PoshAsp.ApiControllers
         {
             Cluster CurrentState = new Cluster(id);
             PowerShell shell = PowerShell.Create();
+
+            //Begin logging
+            LogEntry entry = new LogEntry();
+            entry.Username = HttpContext.Current.User.Identity.Name;
+            entry.Text = "Initiated failover";
+            entry.Data.Add("Before", CurrentState);
+            entry.Data.Add("After", DesiredState);
+            entry.Write("clusterlog");
+            //End logging
 
             shell.AddScript("Import-Module FailoverClusters");
 

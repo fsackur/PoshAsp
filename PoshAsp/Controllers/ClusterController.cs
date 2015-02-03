@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Management.Automation;
+using PoshAsp.Models;
 
 namespace PoshAsp.Controllers
 {
@@ -18,6 +18,11 @@ namespace PoshAsp.Controllers
         public ActionResult Details(string id)
         {
             return View(model:id);
+        }
+
+        public ActionResult History()
+        {
+            return View(new LogEntries("clusterlog"));
         }
     }
 }
