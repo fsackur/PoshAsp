@@ -9,6 +9,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Security.Principal;
 using PoshAsp.Models;
+using MongoDB.Bson.Serialization;
 
 namespace PoshAsp
 {
@@ -21,6 +22,11 @@ namespace PoshAsp
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            BsonClassMap.RegisterClassMap<Cluster>();
+            BsonClassMap.RegisterClassMap<ClusterGroup>();
+            BsonClassMap.RegisterClassMap<Computer>();
+            BsonClassMap.RegisterClassMap<IpAddress>();
         }
 
         protected void Application_PostAuthenticateRequest(Object sender, EventArgs e)
