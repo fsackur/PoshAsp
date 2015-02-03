@@ -10,7 +10,7 @@ namespace PoshAsp.Controllers
     public class ClusterController : Controller
     {
         // GET: Cluster
-        public ActionResult Index()
+        [Authorize] public ActionResult Index()
         {
             return View();
         }

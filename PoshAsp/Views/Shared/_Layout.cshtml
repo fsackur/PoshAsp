@@ -24,6 +24,18 @@
                     <li>@Html.ActionLink("Computer", "Index", "Computer")</li>
                     <li>@Html.ActionLink("Cluster", "Index", "Cluster")</li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        @if (Request.IsAuthenticated)
+                        {
+                            @Html.ActionLink("Logged in as " + User.Identity.Name, "Login", "Auth")
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Not logged in", "Login", "Auth")
+                        }
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

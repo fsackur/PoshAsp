@@ -6,6 +6,9 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Web.Security;
+using System.Security.Principal;
+using PoshAsp.Models;
 
 namespace PoshAsp
 {
@@ -18,6 +21,28 @@ namespace PoshAsp
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        protected void Application_PostAuthenticateRequest(Object sender, EventArgs e)
+        {
+            HttpCookie TokenCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+
+            if (TokenCookie != null)
+            {
+                FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(TokenCookie.Value);
+
+                try
+                {
+                    AuthToken Token = new AuthToken(ticket.UserData);
+                    GenericPrincipal User = new GenericPrincipal(new GenericIdentity(Token.Username), null);
+                    HttpContext.Current.User = User;
+                }
+                catch
+                {
+                    GenericPrincipal User = new GenericPrincipal(new GenericIdentity(String.Empty), null);
+                    HttpContext.Current.User = User;
+                }
+            }
         }
     }
 }

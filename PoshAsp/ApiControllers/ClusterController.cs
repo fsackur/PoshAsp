@@ -11,7 +11,7 @@ namespace PoshAsp.ApiControllers
 {
     public class ClusterController : ApiController
     {
-        public Cluster Get(string id)
+        [Authorize] public Cluster Get(string id)
         {
             return new Cluster(id);
         }
