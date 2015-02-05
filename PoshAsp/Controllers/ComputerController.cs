@@ -9,8 +9,7 @@ namespace PoshAsp.Controllers
 {
     public class ComputerController : Controller
     {
-        //
-        // GET: /Computer/
+        [Authorize]
         public ActionResult Index()
         {
             return View();

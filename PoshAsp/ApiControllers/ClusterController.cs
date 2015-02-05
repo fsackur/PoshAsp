@@ -7,16 +7,21 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using PoshAsp.Models;
+using PoshAsp.Filters;
 
 namespace PoshAsp.ApiControllers
 {
     public class ClusterController : ApiController
     {
-        [Authorize] public Cluster Get(string id)
+        [ApiAuth]
+        [Authorize]
+        public Cluster Get(string id)
         {
             return new Cluster(id);
         }
 
+        [ApiAuth]
+        [Authorize]
         public HttpResponseMessage Put(string id, Cluster DesiredState)
         {
             Cluster CurrentState = new Cluster(id);

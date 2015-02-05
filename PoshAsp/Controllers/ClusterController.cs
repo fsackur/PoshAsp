@@ -9,17 +9,19 @@ namespace PoshAsp.Controllers
 {
     public class ClusterController : Controller
     {
-        // GET: Cluster
-        [Authorize] public ActionResult Index()
+        [Authorize]
+        public ActionResult Index()
         {
             return View();
         }
 
+        [Authorize]
         public ActionResult Details(string id)
         {
             return View(model:id);
         }
 
+        [Authorize]
         public ActionResult History()
         {
             return View(new LogEntries("clusterlog"));
