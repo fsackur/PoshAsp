@@ -23,16 +23,36 @@
         <td>@item.Username</td>
         <td>@item.Text</td>
         <td>
-            @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in OldCluster.ClusterGroups)
-            {
-                @ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name<br />
-            }
+            <ul class="list-unstyled">
+                <li><b>@OldCluster.Name</b></li>
+                @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in OldCluster.ClusterGroups)
+                {
+                    string CssClass = "";
+                
+                    if (NewCluster.ClusterGroups.FirstOrDefault<PoshAsp.Models.ClusterGroup>(e => e.Name == ClusterGroup.Name && e.OwnerNode.Name == ClusterGroup.OwnerNode.Name) == null)
+                    {
+                        CssClass = "bg-danger";
+                    }
+                
+                    <li class="@CssClass">@ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name</li>
+                }
+            </ul>
         </td>
         <td>
-            @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in NewCluster.ClusterGroups)
-            {
-                @ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name<br />
-            }
+            <ul class="list-unstyled">
+                <li><b>@NewCluster.Name</b></li>
+                @foreach (PoshAsp.Models.ClusterGroup ClusterGroup in NewCluster.ClusterGroups)
+                {
+                    string CssClass = "";
+
+                    if (OldCluster.ClusterGroups.FirstOrDefault<PoshAsp.Models.ClusterGroup>(e => e.Name == ClusterGroup.Name && e.OwnerNode.Name == ClusterGroup.OwnerNode.Name) == null)
+                    {
+                        CssClass = "bg-danger";
+                    }
+
+                    <li class="@CssClass">@ClusterGroup.Name<text>: </text>@ClusterGroup.OwnerNode.Name</li>
+                }
+            </ul>
         </td>
     </tr>
 }

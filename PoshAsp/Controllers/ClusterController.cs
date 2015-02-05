@@ -22,9 +22,16 @@ namespace PoshAsp.Controllers
         }
 
         [Authorize]
-        public ActionResult History()
+        public ActionResult History(string id)
         {
-            return View(new LogEntries("clusterlog"));
+            LogEntries FilteredLog = new LogEntries("clusterlog");
+
+            if(! String.IsNullOrEmpty(id) )
+            {
+                FilteredLog.RemoveAll(e => ((Cluster)e.Data["Before"]).Name.ToUpper() != id.ToUpper());
+            }
+            
+            return View(FilteredLog);
         }
     }
 }
