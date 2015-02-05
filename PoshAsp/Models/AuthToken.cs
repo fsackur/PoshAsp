@@ -57,6 +57,16 @@ namespace PoshAsp.Models
             }
         }
 
+        public void Invalidate()
+        {
+            MongoClient client = new MongoClient(Properties.Settings.Default.MongoConnectionString);
+            MongoServer server = client.GetServer();
+            MongoDatabase db = server.GetDatabase(Properties.Settings.Default.MongoDb);
+            MongoCollection<AuthToken> tokens = db.GetCollection<AuthToken>("tokens");
+
+            tokens.Remove(Query<AuthToken>.EQ(e => e.Id, this.Id));
+        }
+
         public ObjectId Id
         {
             get { return _Id; }

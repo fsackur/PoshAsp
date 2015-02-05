@@ -15,7 +15,20 @@ namespace PoshAsp.Controllers
         {
             if(HttpContext.User.Identity.IsAuthenticated)
             {
-                return View("LoggedIn");
+                HttpCookie TokenCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+                FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(TokenCookie.Value);
+
+                try
+                {
+                    AuthToken Token = new AuthToken(ticket.UserData);
+                    Token.Invalidate();
+                    Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
+                    return RedirectToAction("Index", "Home");
+                }
+                catch
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
             else
             {
